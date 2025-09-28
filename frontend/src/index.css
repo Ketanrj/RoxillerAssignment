@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "./assets/fonts/font.css";
+
+
+@theme {
+  --color-primary: oklch(60.6% 0.25 292.717);
+  --color-primary-border: oklch(67.3% 0.182 276.935);
+  --font-satoshi: "Satoshi", sans-serif;
+}
