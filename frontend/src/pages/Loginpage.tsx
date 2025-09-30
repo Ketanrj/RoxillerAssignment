@@ -1,7 +1,7 @@
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { useState } from 'react'
 import Login from '../components/Login'
-import { useLocation, useNavigate } from 'react-router'
+import {useLocation, useNavigate} from 'react-router'
 import { LoginSchema } from '../schema/user'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -18,7 +18,7 @@ type Props = {}
 function Loginpage({ }: Props): React.ReactNode {
 
   const [succesMessage, setsuccessMessage] = useState('');
-  const { setAuth } = useAuth();
+  const { setAuth, auth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from.pathname || '/';
@@ -34,9 +34,9 @@ function Loginpage({ }: Props): React.ReactNode {
       )
       if (response.status == 200) {
         const result = await response.data;
-        console.log(result);
-        setAuth({name: result.name, email: result.email, role: result.role, token: result.token});
         setsuccessMessage('Logged in SuccessFully')
+        localStorage.setItem('accessToken', result?.accessToken);        
+        setAuth({...auth, token: localStorage.getItem('accessToken') || ''})
         navigate(from, { replace: true });
       }
     } catch (error: any) {
