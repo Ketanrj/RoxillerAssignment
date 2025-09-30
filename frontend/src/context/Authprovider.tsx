@@ -14,10 +14,12 @@ type Props = {
 
 function Authprovider({ children }: Props) {
   const [auth, setAuth] = useState({
+    name:'',
     email: '',
-    password: '',
+    role: '',
     token: ''
   });
+
 
 
   return (

@@ -2,40 +2,33 @@ import {useState } from "react";
 import InputComponent from "../components/ui/InputComponent";
 import axios from "../api/axios";
 import { useNavigate } from "react-router";
+import useAuth from "../hooks/useAuth";
 
-const NEW_USER_URL = 'api/admin/user/new'
-const ACCESS_TOKEN = 'accessToken';
-const token = localStorage.getItem(ACCESS_TOKEN);
+const NEW_USER_URL = 'api/admin/user/update'
 
 type Props = {}
 
 type User = {
-    name: string;
-    email: string;
-    address: string;
-    password: string;
-    role: string;
+    name?: string;
+    email?: string;
+    address?: string;
+    password?: string;
+    role?: string;
 }
 
 
 function Newuserpage({ }: Props) {
-    const [user, setUser] = useState<User>({
-        name: '',
-        email: '',
-        address: '',
-        password: '',
-        role: '',
-    });
+    const [user, setUser] = useState<User>();
+    const {auth} = useAuth();
 
     const UserRoles = ['NORMAL_USER', 'ADMIN', 'STORE_OWNER']
-
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
-            const res = await axios.post(NEW_USER_URL, user, {
-                headers: { Authorization: token }
+            const res = await axios.patch(NEW_USER_URL, user, {
+                headers: { Authorization: auth.token }
             })
             if (res.status !== 400) {
                 alert("User Created Successfully")
@@ -97,7 +90,7 @@ function Newuserpage({ }: Props) {
                             <select
                                 required={true}
                                 className="flex w-[8rem]  h-10 bg-white border border-slate-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                value={user.role || ""}
+                                value={user?.role || ""}
                                 onChange={(e) => setUser({ ...user, role: e.target.value })}
                             >
                                 <option value={undefined} className="text-slate-500">

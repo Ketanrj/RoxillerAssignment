@@ -23,6 +23,7 @@ model User {
   stores    Store[]  @relation("StoreOwner")
   ratings   Rating[]
   passwordReset Passwordreset?
+  refreshToken String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

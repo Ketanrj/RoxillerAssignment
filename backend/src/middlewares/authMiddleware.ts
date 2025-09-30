@@ -11,7 +11,7 @@ interface JWTPayload {
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const accessToken = req.headers.authorization;
     if (!accessToken) {
-       res.status(401).send('User Not Authorized')
+       return res.status(401).send('User Not Authorized')
     }
         try {
             const payload = jwt.verify(accessToken!.toString(), SECRET_KEY) as JWTPayload

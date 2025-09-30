@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { hashSync } from "bcrypt";
 import { prismaClient } from "..";
 
+
 export const newuser = async (req: Request, res: Response) => {
   const { name, email, address, password, role } = req.body;
 

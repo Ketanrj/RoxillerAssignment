@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from '../api/axios';
+import useAuth from '../hooks/useAuth';
 
 const USER_LIST_URL = 'api/admin/user/search'
-const ACCESS_TOKEN = 'accessToken';
-const token = localStorage.getItem(ACCESS_TOKEN);
 
 type UserList = {
     id: string,
@@ -39,6 +38,7 @@ const UserListings = () => {
         hasPrev: false
     });
 
+    const {auth} = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
     const [roleFilter, setRoleFilter] = useState('');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -71,7 +71,7 @@ const UserListings = () => {
 
             const response = await axios.get(`${USER_LIST_URL}?${params.toString()}`, {
                 headers: {
-                    Authorization: token,
+                    Authorization: auth.token,
                 }
             });
 
@@ -89,7 +89,7 @@ const UserListings = () => {
         } finally {
             setLoading(false);
         }
-    }, [token]);
+    }, [auth.token]);
 
 
     useEffect(() => {

@@ -48,6 +48,9 @@ function Login({ register, handleSubmit, isSubmitting, errors, succesMessage }: 
                 <Loader2 size={20} className="animate-spin" />
                 : "Log in"}
             </button>
+            <div className="flex justify-end">
+                  <Link to={'/forgetpassword'}><span className="flex text-primary text-sm mt-1">Forget Password?</span></Link>
+            </div>
           </div>
         </form>
         {/* Footer */}

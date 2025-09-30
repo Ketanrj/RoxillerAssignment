@@ -1,10 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import { ChevronDown, ArrowUpDown } from 'lucide-react';
 import axios from '../api/axios';
+import useAuth from '../hooks/useAuth';
 
 const STORE_LIST_URL = 'api/admin/store/search'
-const ACCESS_TOKEN = 'accessToken';
-const token = localStorage.getItem(ACCESS_TOKEN);
 
 type StoreList = {
     id: number,
@@ -17,6 +16,7 @@ type StoreList = {
 const StoreListings = () => {
 
     const [storeList, setStoreList] = useState<StoreList[]>();
+    const {auth} = useAuth();
 
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -25,7 +25,7 @@ const StoreListings = () => {
         const getStoreList = async () => {
             const response = await axios.get(STORE_LIST_URL, {
                 headers: {
-                    Authorization: token,
+                    Authorization: auth.token,
                 }
             });
 

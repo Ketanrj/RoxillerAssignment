@@ -21,7 +21,7 @@ export const sendEmail = async ({email, subject, message} : mailOptions) => {
         from: '"StoreListings Support" <support@storeListings.com>',
         to: email,
         subject: subject,
-        text: message,
+        html: message,
     }
 
     await transporter.sendMail(mailOptions);

@@ -3,8 +3,6 @@ import UserListings from '../components/UserListings';
 
 
 
-
-
 const Userpage = () => {
 
     return (
@@ -17,7 +15,7 @@ const Userpage = () => {
                 <main className="flex-1 p-6 overflow-auto max-w-6xl">
                     <UserListings/>
                     <div className="mt-8 ">
-                        <Link to='/createStore'>
+                        <Link to='/createuser'>
                             <button className='bg-primary text-white text-shadow-2xs px-4 py-2 border border-slate-200 rounded-lg cursor-pointer hover:shadow-sm '>Add new User</button>
                         </Link>
                     </div>

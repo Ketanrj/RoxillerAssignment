@@ -1,23 +1,24 @@
 import { Store } from "lucide-react";
 import axios from "../../api/axios";
 import { useEffect, useState } from "react";
+import useAuth from "../../hooks/useAuth";
 
 
 const COUNT_USER_URL = 'api/admin/store/count'
-const ACCESS_TOKEN = 'accessToken';
-const token = localStorage.getItem(ACCESS_TOKEN);
 
 
 
 const Storecount = () => {
     const [count, setCount] = useState(0);
+        const {auth} = useAuth();
+
 
     useEffect(() => {
         const getCount = async () => {
             try {
                 const response = await axios.get(COUNT_USER_URL, {
                     headers: {
-                        Authorization: token
+                        Authorization: auth.token
                     },
                 });
 

@@ -1,12 +1,11 @@
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useEffect, useState } from "react";
 import InputComponent from "../components/ui/InputComponent";
 import axios from "../api/axios";
-import { isAxiosError, type AxiosError } from "axios";
-import { Navigate, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
+import useAuth from "../hooks/useAuth";
 
 const OWNER_LIST_URL = 'api/admin/user/ownerlist'
 const CREATE_STORE = 'api/admin/store/create'
-const token = localStorage.getItem('accessToken')
 
 type Props = {}
 
@@ -29,6 +28,8 @@ function Newstore({ }: Props) {
         address: '',
         ownerId: ''
     });
+    const {auth} = useAuth();
+
 
     const navigate = useNavigate();
 
@@ -38,7 +39,7 @@ function Newstore({ }: Props) {
     useEffect(() => {
         const getOwnerList = async () => {
             const response = await axios.get(OWNER_LIST_URL, {
-                headers: { Authorization: token }
+                headers: { Authorization: auth.token }
             })
             console.log(response.data);
             if (response.status !== 400) {
@@ -53,7 +54,7 @@ function Newstore({ }: Props) {
         e.preventDefault()
         try {
             const res = await axios.post(CREATE_STORE, store, {
-                headers: { Authorization: token }
+                headers: { Authorization: auth.token }
             })
             if (res.status !== 400) {
                 alert("Store Created Successfully")

@@ -2,15 +2,18 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import Loginpage from "./pages/Loginpage.tsx";
 import Signuppage from "./pages/Signuppage.tsx";
 import Layout from "./components/Layout.tsx";
-// import PersistLogin from "./components/PersistLogin.tsx";
+import PersistLogin from "./components/PersistLogin.tsx";
 import Authprovider from "./context/Authprovider.tsx";
-// import RequireAuth from "./components/RequireAuth.tsx";
 import Homepage from "./pages/Homepage.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Userpage from "./pages/Userpage.tsx";
 import Storepage from "./pages/Storepage.tsx";
 import Newstore from "./pages/Newstore.tsx";
 import Newuserpage from "./pages/Newuserpage.tsx";
+import RequireAuth from "./components/RequireAuth.tsx";
+import Profilepage from "./pages/Profilepage.tsx";
+import Forgetpassword from "./pages/Forgetpassword.tsx";
+import Resetpassword from "./pages/Resetpassword.tsx";
 
 
 // define routes here itself
@@ -20,10 +23,10 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        // element: <PersistLogin/>,
+        element: <PersistLogin />,
         children: [
           {
-            // element: <RequireAuth />,
+            element: <RequireAuth />,
             children: [
               {
                 element: <Homepage />,
@@ -34,6 +37,7 @@ const router = createBrowserRouter([
                   { path: '/createStore', element: <Newstore /> },
                   { path: '/user', element: <Userpage /> },
                   { path: '/createuser', element: <Newuserpage /> },
+                  { path: '/profilepage', element: <Profilepage /> },
                 ]
               }
             ]
@@ -42,6 +46,8 @@ const router = createBrowserRouter([
       },
       { path: "login", element: <Loginpage /> },
       { path: "register", element: <Signuppage /> },
+      { path: '/forgetpassword', element: <Forgetpassword /> },
+      { path: '/resetpassword/:token', element: <Resetpassword /> },
     ],
   },
 ]);

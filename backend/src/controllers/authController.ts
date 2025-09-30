@@ -6,6 +6,8 @@ import { prismaClient } from "..";
 import { generateResetToken } from "../utils/generateToken";
 import { sendEmail } from "../utils/sendEmail";
 import { Passwordreset } from "@prisma/client";
+import { z } from 'zod'
+import { passwordSchema, ResetpasswordSchema, userUpdateSchema } from "../schema/userSchema";
 
 
 export const signup = async (req: Request, res: Response) => {
@@ -32,24 +34,61 @@ export const signup = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-    let foundUser = await prismaClient.user.findFirst({ where: { email: email } })
-    if (!foundUser) {
+    let user = await prismaClient.user.findFirst({ where: { email: email } })
+    if (!user) {
         throw new Error("User Does not Exist! Please SignUp")
     }
 
-    let pass = compareSync(password, foundUser.password);
+    let pass = compareSync(password, user.password);
     if (!pass) {
         return res.status(401).send("Password is incorrect");
     }
 
-    const accessToken = jwt.sign({
-        userId: foundUser.id
-    }, SECRET_KEY)
+    const accessToken = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '2m' })
+    const refreshToken = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '2h' })
 
+    await prismaClient.user.update({
+        where: {
+            id: user.id,
+        },
+        data: {
+            refreshToken: refreshToken
+        }
+    })
 
-    res.json({accessToken})
+    res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        maxAge: 2 * 60 * 60 * 1000
+    });
+
+    res.json({ name: user.name, email: user.email, role: user.role, token: accessToken })
 }
 
+export const logout = async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken
+    if (!refreshToken) {
+        return res.status(401).json({ message: "Unauthorized" })
+    }
+
+    const user = await prismaClient.user.findFirst({ where: { refreshToken: refreshToken } })
+    if (!user) {
+        return res.clearCookie('refreshToken', { httpOnly: true, secure: false, sameSite: 'lax' });
+    }
+
+    //delete the token
+    const deleteRefreshToken = await prismaClient.user.update(({
+        where: { id: user.id },
+        data: { refreshToken: null },
+    }));
+
+    res.clearCookie('refreshToken', { httpOnly: true, secure: false, sameSite: 'lax' });
+
+    if (deleteRefreshToken) {
+        return res.json({ message: `${user.name} logged out Successfully!` })
+    }
+}
 
 export const forgetpassword = async (req: Request, res: Response) => {
     try {
@@ -73,9 +112,17 @@ export const forgetpassword = async (req: Request, res: Response) => {
         })
 
         //Send Token using MAIL TRAP
-        const resetUrl = `${req.protocol}://${req.get('host')}/api/auth/resetPassword/${token}`;
-        const message = `<a>We have received a password 
-        reset request. Please use the below link to reset your password\n\n${resetUrl}<a/>`
+        const resetUrl = `http://localhost:5173/resetpassword/${token}`;
+        const message = `<p>We have received a password reset request.</p>
+                        <p>Please click the button below to reset your password:</p>
+                        <a href="${resetUrl}" style="
+                            display:inline-block;
+                            padding:10px 20px;
+                            background:#007bff;
+                            color:#fff;
+                            text-decoration:none;
+                            border-radius:5px;
+                        ">Reset Password</a>`;
 
         try {
             await sendEmail({
@@ -84,7 +131,7 @@ export const forgetpassword = async (req: Request, res: Response) => {
                 message: message
             })
 
-            res.status(200).json({ status: 'Success', message: 'Password Reset Mail Sent to the user email' })
+            return res.status(200).json({ status: 'Success', message: 'Password Reset Mail Sent to the user email' })
         } catch (error) {
             await prismaClient.passwordreset.update({
                 where: {
@@ -109,14 +156,23 @@ export const forgetpassword = async (req: Request, res: Response) => {
 export const resetpassword = async (req: Request, res: Response) => {
     try {
         const token = req.params.token;
-        const { password, confirmpassword } = req.body;
+        console.log("///////////", req.body);
+        const response = z.safeParse(ResetpasswordSchema, req.body);
         if (!token) {
             return res.status(403).json({ message: 'Token is Expired or Not present' })
         }
 
-        if (!password || !confirmpassword || password !== confirmpassword) {
-            return res.status(400).json({ message: 'Password and Confirm Password should be Equal' })
+        if (!response.success) {
+            // If validation fails, return a 400 response with the error details
+            return res.status(400).json({
+                success: false,
+                message: 'Validation failed',
+                errors: response.error.issues,
+            });
         }
+
+        const {password, confirmpassword} = response.data;
+
         // 1. Validate the token from the params
         const passwordreset = await prismaClient.passwordreset.findFirst({ where: { token: token } });
 
@@ -133,7 +189,7 @@ export const resetpassword = async (req: Request, res: Response) => {
             }
         })
         // 4. Password Reset Successfull Delete Record
-        await prismaClient.passwordreset.delete({where: {id: passwordreset.id}});
+        await prismaClient.passwordreset.delete({ where: { id: passwordreset.id } });
 
         return res.status(200).json({ message: "Paasord Reset Successfulluy" });
     } catch (error) {
@@ -146,15 +202,64 @@ export const me = async (req: Request, res: Response) => {
     try {
         const User = req.user;
 
-    const response = {
-        name: User?.name,
-        email: User?.email,
-        role: User?.role
-    }
+        const response = {
+            name: User?.name,
+            email: User?.email,
+            role: User?.role
+        }
 
-    res.json(response)
+        return res.json(response)
     } catch (error) {
         console.error("Error in Fetching User:", error);
         return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export const updateuser = async (req: Request, res: Response) => {
+    try {
+        const user = req.user;
+        const { name, email } = z.parse(userUpdateSchema, req.body);
+        if (!user?.id) {
+            return res.status(401).json({ message: "User is anauthorized" });
+        }
+
+        console.log('/////////////////////////////////////////', name, email)
+
+        await prismaClient.user.update({
+            where: { id: user.id },
+            data: {
+                name: name,
+                email: email,
+            }
+        })
+
+        return res.status(200).json({ message: "User Data Updated Successfully" })
+    } catch (error) {
+        console.error("Error Owner List:", error);
+        return res.status(500).json({ message: "Internal server error", error });
+    }
+}
+
+
+export const updatepassword = async (req: Request, res: Response) => {
+    try {
+        const user = req.user;
+        const { password } = z.parse(passwordSchema, req.body);
+        if (!user?.id) {
+            return res.status(401).json({ message: "User is anauthorized" });
+        }
+
+
+        await prismaClient.user.update({
+            where: { id: user.id },
+            data: {
+                password: hashSync(password, Number(SALT_VALUE)),
+            }
+        })
+
+        return res.status(200).json({ message: "Password Updated Successfully" })
+    } catch (error) {
+        console.error("Error Owner List:", error);
+        return res.status(500).json({ message: "Internal server error", error });
     }
 }
