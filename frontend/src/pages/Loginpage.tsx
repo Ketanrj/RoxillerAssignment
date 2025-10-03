@@ -1,7 +1,7 @@
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { useState } from 'react'
 import Login from '../components/Login'
-import {useLocation, useNavigate} from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import { LoginSchema } from '../schema/user'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -35,9 +35,10 @@ function Loginpage({ }: Props): React.ReactNode {
       if (response.status == 200) {
         const result = await response.data;
         setsuccessMessage('Logged in SuccessFully')
-        localStorage.setItem('accessToken', result?.accessToken);        
-        setAuth({...auth, token: localStorage.getItem('accessToken') || ''})
-        navigate(from, { replace: true });
+        setAuth({ name: result.name, email: result.email, role: result.role, token: result.token });
+        if (result.role === "ADMIN") navigate("/dashboard", { replace: true });
+        else if (result.role === "NORMAL_USER") navigate("/Userstorelistings", { replace: true });
+        else if (result.role === "STORE_OWNER") navigate("/ownerdashboard", { replace: true });
       }
     } catch (error: any) {
       if (isAxiosError(error)) {

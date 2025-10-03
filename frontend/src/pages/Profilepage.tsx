@@ -65,7 +65,7 @@ function Profilepage({ }: Props) {
     return (
         <section className='flex flex-col items-start mx-8 mt-4'>
             <div className="flex mt-4 ">
-                <Link to={'/'}>
+                <Link to={auth.role === 'ADMIN' ? '/dashboard' : auth.role === 'NORMAL_USER' ? '/Userstorelistings' : '/Ownerdashboard' }>
                     <button className='flex font-normal border border-gray-200 text-shadow-2xs transition duration-300 hover:shadow-sm hover:shadow-gray-100 hover:border-gray-300 px-2 py-1 rounded-lg cursor-pointer hover:text-gray-700 text-gray-600 items-center gap-0.5'><ChevronLeft />Home</button>
                 </Link>
             </div>

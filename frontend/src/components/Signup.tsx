@@ -35,22 +35,21 @@ function Signup({
 
         <form className="space-y-4 text-gray-600" onSubmit={handleSubmit}>
           {/* Name */}
-          <div>
-            <InputComponent
-              label="Name"
-              autoComplete="off"
-              id="name"
-              type="text"
-              {...register("name")}
-              placeholder="John Doe"
-            />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-            )}
-          </div>
-
-          {/* Email */}
-          <div>
+          <div className="flex flex-row gap-4">
+            <div className="flex-1 flex-col">
+              <InputComponent
+                label="Name"
+                autoComplete="off"
+                id="name"
+                type="text"
+                {...register("name")}
+                placeholder="John Doe"
+              />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+              )}
+            </div>
+             <div className="flex-1 flex-col">
             <InputComponent
               label="Email"
               id="email"
@@ -61,6 +60,7 @@ function Signup({
             {errors.email && (
               <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
             )}
+            </div>
           </div>
 
           {/* Address */}

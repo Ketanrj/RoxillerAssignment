@@ -44,7 +44,7 @@ export const login = async (req: Request, res: Response) => {
         return res.status(401).send("Password is incorrect");
     }
 
-    const accessToken = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '2m' })
+    const accessToken = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '5m' })
     const refreshToken = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '2h' })
 
     await prismaClient.user.update({

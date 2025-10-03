@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowUpDown, ChevronLeft, ChevronRight, Loader } from 'lucide-react';
 import axios from '../api/axios';
 import useAuth from '../hooks/useAuth';
 
@@ -45,7 +45,6 @@ const UserListings = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Debounced search function
     const getUserList = useCallback(async (
         page: number = 1,
         search: string = '',
@@ -96,11 +95,10 @@ const UserListings = () => {
         getUserList(1, searchTerm, roleFilter, pagination.limit);
     }, []);
 
-    // Debounced search effect
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             getUserList(1, searchTerm, roleFilter, pagination.limit);
-        }, 500); // 500ms delay
+        }, 500); 
 
         return () => clearTimeout(timeoutId);
     }, [searchTerm, roleFilter, getUserList]);
@@ -164,7 +162,7 @@ const UserListings = () => {
                 {/* Loading/Error */}
                 {loading && (
                     <div className="px-6 py-8 text-center text-slate-500 flex-1">
-                        Loading users...
+                       <Loader className='animate-spin text-primary transition duration-300' />
                     </div>
                 )}
 

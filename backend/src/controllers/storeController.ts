@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { prismaClient } from ".."; 
+import { prismaClient } from "..";
 
 export const createStore = async (req: Request, res: Response) => {
   try {
@@ -13,7 +13,7 @@ export const createStore = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Owner not found" });
     }
 
-    if(owner?.role == 'NORMAL_USER' || owner?.role == 'ADMIN' ){
+    if (owner?.role == 'NORMAL_USER' || owner?.role == 'ADMIN') {
       return res.status(400).json({ message: "Only Store Owner can create Store" });
     }
 
@@ -38,6 +38,7 @@ export const createStore = async (req: Request, res: Response) => {
 
 export const storeList = async (req: Request, res: Response) => {
   try {
+    const user = req.user;
     const { name, email, address, sortBy, order } = req.query;
 
     const sortField = sortBy ? String(sortBy) : "name";
@@ -54,24 +55,40 @@ export const storeList = async (req: Request, res: Response) => {
         name: true,
         email: true,
         address: true,
+        owner: {
+          select: { id: true, name: true }
+        },
         ratings: {
-          select: { rating: true },
+          select: { user: true,
+            rating: true
+          }
         },
       },
-      orderBy: { [sortField]: sortOrder },
-    });
+        orderBy: { [sortField]: sortOrder },
+      });
 
     if (stores.length === 0) {
       return res.status(404).send("No stores to display");
     }
 
-    const responseStore = stores.map((store) => ({
-      id: store.id,
-      name: store.name,
-      email: store.email,
-      address: store.address,
-      ratingsCount: store.ratings.length, 
-    }));
+    const responseStore = stores.map((store) => {
+      const totalRatings = store.ratings.length;
+      const averageRating =
+        totalRatings > 0
+          ? store.ratings.reduce((sum, r) => sum + r.rating, 0) / totalRatings
+          : 0;
+
+      return {
+        id: store.id,
+        name: store.name,
+        email: store.email,
+        address: store.address,
+        ownerId: store.owner.id,
+        ownerName: store.owner.name,
+        totalRatings,
+        averageRating: Number(averageRating.toFixed(2)), // rounding
+      };
+    });
 
     res.json(responseStore);
   } catch (error) {
@@ -80,16 +97,17 @@ export const storeList = async (req: Request, res: Response) => {
   }
 };
 
-export const storeCount = async (req: Request, res: Response) => {
-    try {
-        const store = await prismaClient.store.count();
-        if (store == 0) {
-            return res.status(404).send("No Store Exists")
-        }
-        return res.json(store);
 
-    } catch (error) {
-        console.error("Error fetching store count:", error);
-        return res.status(500).json({ message: "Internal server error" });
+export const storeCount = async (req: Request, res: Response) => {
+  try {
+    const store = await prismaClient.store.count();
+    if (store == 0) {
+      return res.status(404).send("No Store Exists")
     }
+    return res.json(store);
+
+  } catch (error) {
+    console.error("Error fetching store count:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 }

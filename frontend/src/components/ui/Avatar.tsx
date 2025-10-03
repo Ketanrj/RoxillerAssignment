@@ -4,7 +4,7 @@ import { UserIcon } from "lucide-react";
 
 type AvatarProps = {
     size?: "sm" | "md" | "lg";
-    title: string;
+    title?: string;
     subtitle?: string;
     role?: string;
 };
@@ -25,14 +25,14 @@ export const Avatar: React.FC<AvatarProps> = ({
     return (
         <div className="flex items-center space-x-2">
             <div
-                className={clsx("flex items-center p-1 rounded-full bg-slate-100 object-cover justify-center border border-slate-300", sizeClasses[size])}
+                className={clsx("flex items-center px-3 py-1 rounded-full bg-slate-100 object-cover justify-center border border-slate-300", sizeClasses[size])}
             >
                 <UserIcon className="text-primary" />
             </div>
             <div className="flex flex-col">
                 <div className="flex gap-2 items-center">
-                    <span className="font-semibold text-gray-900">{title}</span>
-                    {role && <span className="text-xs border h-fit border-slate-200 bg-slate-100 rounded-md px-2 text-primary">
+                    <span className="flex font-semibold text-sm text-gray-900">{title}</span>
+                    {role && <span className="flex text-xs border h-fit border-slate-300 bg-slate-100 rounded-lg py-1 px-1 text-primary">
                         {role}
                     </span>}
                 </div>

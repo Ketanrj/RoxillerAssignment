@@ -6,6 +6,7 @@ type Props = {}
 function Layout({}: Props) {
   return (
     <main>
+      <h1></h1>
         <Outlet/>
     </main>
   )

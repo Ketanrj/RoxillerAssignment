@@ -28,10 +28,10 @@ function LogoutButton({ }: Props) {
     }
 
     return (
-        <div className='flex w-full justify-center items-center px-2'>
+        <div className='flex w-full justify-center'>
             <button
                 onClick={handleLogout}
-                className='flex w-full cursor-pointer items-center mt-2 gap-2 px-3 py-2 text-sm font-medium rounded-md transition text-red-500 bg-red-100'><LogOutIcon size={20}/>Logout</button>
+                className='flex px-4 w-full py-3 gap-2 bg-slate-100 border-t border-b border-slate-300 text-slate-800 text-sm cursor-pointer hover:text-red-500'><LogOutIcon size={20}/>Logout</button>
         </div>
     )
 }

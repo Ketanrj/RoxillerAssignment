@@ -12,14 +12,13 @@ export const ownerDashboard = async (req: Request, res: Response) => {
     const store = await prismaClient.store.findFirst({
       where: { ownerId },
       select: {
-        id: true,
         name: true,
+        address:true,
         ratings: {
           select: {
             rating: true,
             user: {
               select: {
-                id: true,
                 name: true,
                 email: true,
               },
@@ -40,15 +39,15 @@ export const ownerDashboard = async (req: Request, res: Response) => {
         : null;
 
     return res.json({
-      storeId: store.id,
       storeName: store.name,
+      address: store.address,
       averageRating: avgRating,
       users: store.ratings.map((r) => ({
-        userId: r.user.id,
         name: r.user.name,
         email: r.user.email,
         rating: r.rating,
       })),
+      totalRatings: store.ratings.length,
     });
   } catch (error) {
     console.error("Error fetching owner dashboard:", error);
