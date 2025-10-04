@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { hashSync } from "bcrypt";
-import { prismaClient } from "../api";
+import { prismaClient } from "../app";
 
 
 export const newuser = async (req: Request, res: Response) => {

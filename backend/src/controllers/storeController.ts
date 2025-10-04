@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { prismaClient } from "../api";
+import { prismaClient } from "../app";
 
 export const createStore = async (req: Request, res: Response) => {
   try {

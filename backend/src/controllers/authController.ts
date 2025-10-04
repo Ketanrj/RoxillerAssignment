@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { hashSync, compareSync } from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
 import { SECRET_KEY, SALT_VALUE } from "../secrets";
-import { prismaClient } from "../api";
+import { prismaClient } from "../app";
 import { generateResetToken } from "../utils/generateToken";
 import { sendEmail } from "../utils/sendEmail";
 import { Passwordreset } from "@prisma/client";

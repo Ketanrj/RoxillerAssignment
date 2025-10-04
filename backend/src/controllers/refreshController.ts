@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as jwt from 'jsonwebtoken';
 import { SECRET_KEY } from "../secrets";
-import { prismaClient } from "../api";
+import { prismaClient } from "../app";
 
 
 export const refresh = async (req: Request, res: Response) => {

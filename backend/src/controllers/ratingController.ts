@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { prismaClient } from "../api";
+import { prismaClient } from "../app";
 
 
 export const ratingCount = async (req: Request, res: Response) => {
