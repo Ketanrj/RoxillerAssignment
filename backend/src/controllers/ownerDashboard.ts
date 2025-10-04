@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { prismaClient } from "..";
+import { prismaClient } from "../api";
 
 export const ownerDashboard = async (req: Request, res: Response) => {
   try {

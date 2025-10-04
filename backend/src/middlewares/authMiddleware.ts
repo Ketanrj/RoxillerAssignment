@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import { SECRET_KEY } from "../secrets";
-import { prismaClient } from "..";
+import { prismaClient } from "../api";
 import { User } from "@prisma/client";
 
 interface JWTPayload {
